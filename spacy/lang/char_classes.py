@@ -17,6 +17,8 @@ _tamil = r"\u0B80-\u0BFF"
 
 _telugu = r"\u0C00-\u0C7F"
 
+_tibetan = r"\u0F00-\u0FFF"
+
 # from the final table in: https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 _cjk = (
     r"\u4E00-\u62FF\u6300-\u77FF\u7800-\u8CFF\u8D00-\u9FFF\u3400-\u4DBF"
@@ -217,8 +219,22 @@ _macedonian_lower = r"ѓѕјљњќѐѝ"
 _macedonian_upper = r"ЃЅЈЉЊЌЀЍ"
 _macedonian = r"ѓѕјљњќѐѝЃЅЈЉЊЌЀЍ"
 
-_upper = LATIN_UPPER + _russian_upper + _tatar_upper + _greek_upper + _ukrainian_upper + _macedonian_upper
-_lower = LATIN_LOWER + _russian_lower + _tatar_lower + _greek_lower + _ukrainian_lower + _macedonian_lower
+_upper = (
+    LATIN_UPPER
+    + _russian_upper
+    + _tatar_upper
+    + _greek_upper
+    + _ukrainian_upper
+    + _macedonian_upper
+)
+_lower = (
+    LATIN_LOWER
+    + _russian_lower
+    + _tatar_lower
+    + _greek_lower
+    + _ukrainian_lower
+    + _macedonian_lower
+)
 
 _uncased = (
     _bengali
@@ -231,9 +247,12 @@ _uncased = (
     + _telugu
     + _hangul
     + _cjk
+    + _tibetan
 )
 
-ALPHA = group_chars(LATIN + _russian + _tatar + _greek + _ukrainian + _macedonian + _uncased)
+ALPHA = group_chars(
+    LATIN + _russian + _tatar + _greek + _ukrainian + _macedonian + _uncased
+)
 ALPHA_LOWER = group_chars(_lower + _uncased)
 ALPHA_UPPER = group_chars(_upper + _uncased)
 

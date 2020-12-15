@@ -43,6 +43,11 @@ def bn_tokenizer():
 
 
 @pytest.fixture(scope="session")
+def bo_tokenizer():
+    return get_lang_class("bo").Defaults.create_tokenizer()
+
+
+@pytest.fixture(scope="session")
 def ca_tokenizer():
     return get_lang_class("ca").Defaults.create_tokenizer()
 
@@ -247,9 +252,11 @@ def th_tokenizer():
 def tr_tokenizer():
     return get_lang_class("tr").Defaults.create_tokenizer()
 
+
 @pytest.fixture(scope="session")
 def tr_vocab():
     return get_lang_class("tr").Defaults.create_vocab()
+
 
 @pytest.fixture(scope="session")
 def tt_tokenizer():
