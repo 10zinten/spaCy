@@ -46,7 +46,7 @@ def bn_tokenizer():
 
 @pytest.fixture(scope="session")
 def bo_tokenizer():
-    return get_lang_class("bo").Defaults.create_tokenizer()
+    return get_lang_class("bo")().tokenizer
 
 
 @pytest.fixture(scope="session")
@@ -260,11 +260,9 @@ def ti_tokenizer():
     return get_lang_class("ti")().tokenizer
 
 
-
 @pytest.fixture(scope="session")
 def tr_tokenizer():
     return get_lang_class("tr")().tokenizer
-
 
 
 @pytest.fixture(scope="session")

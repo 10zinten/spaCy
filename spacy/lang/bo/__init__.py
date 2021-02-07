@@ -1,61 +1,97 @@
+import warnings
+from enum import Enum
+from typing import Dict
+
+from thinc.config import SECTION_PREFIX
+
 from ... import util
 from ...attrs import LANG
-from ...language import Language
+from ...errors import Warnings
+from ...language import DEFAULT_CONFIG, Language
 from ...tokens import Doc
-from ..tokenizer_exceptions import BASE_EXCEPTIONS
+from ...util import DummyTokenizer, registry
 from .stop_words import STOP_WORDS
 
+DEFAULT_CONFIG = """
+[nlp]
 
-def try_botok_import(use_botok):
-    try:
-        from botok import Text
+[nlp.tokenizer]
+@tokenizers = "spacy.bo.TibetanTokenizer"
+segmenter = "syl"
+"""
 
-        Text("བཀྲ་ཤིས་").tokenize_words_raw_lines
-        return Text
-    except ImportError:
-        if use_botok:
-            msg = (
-                "botok not installed. Install it with `pip install botok` ",
-                "or from https://github.com/Esukhia/botok",
+
+class Segmenter(str, Enum):
+    syl = "syl"
+    botok = "botok"
+
+    @classmethod
+    def values(cls):
+        return list(cls.__members__.keys())
+
+
+@registry.tokenizers("spacy.bo.TibetanTokenizer")
+def create_tibetan_tokenizer(segmenter: Segmenter = Segmenter.syl, config: Dict = {}):
+    def tibetan_tokenizer_factory(nlp):
+        return TibetanTokenizer(nlp, segmenter=segmenter, config=config)
+
+    return tibetan_tokenizer_factory
+
+
+class TibetanTokenizer(DummyTokenizer):
+    def __init__(self, nlp, segmenter: Segmenter = Segmenter.syl, config={}):
+        self.vocab = nlp.vocab
+        self.config = config
+        if isinstance(segmenter, Segmenter):
+            segmenter = segmenter.value
+        self.segmenter = segmenter
+        self.botok_seg = None
+        if segmenter not in Segmenter.values():
+            warn_msg = Warnings.W102.format(
+                lang="Tibetan",
+                segmenter=segmenter,
+                supported=", ".join(Segmenter.values()),
+                default="'syl' (syllable segmentation)",
             )
-            raise ImportError(msg)
+            warnings.warn(warn_msg)
+            self.segmenter = Segmenter.syl
+        if segmenter == Segmenter.botok:
+            self.botok_seg = try_botok_import()
 
-
-class TibetanTokenizer(util.DummyTokenizer):
-    def __init__(self, cls, nlp=None, config={}):
-        self.use_botok = config.get("use_botok", cls.use_botok)
-        self.vocab = nlp.vocab if nlp is not None else cls.create_vocab(nlp)
-        self.word_tokenizer = try_botok_import(self.use_botok)
-
-    def __call__(self, text):
-        if self.use_botok:
-            words = self.word_tokenizer(text).tokenize_words_raw_lines.split()
+    def __call__(self, text) -> Doc:
+        if self.segmenter == Segmenter.botok:
+            words = self.botok_seg(text).tokenize_words_raw_lines.split()
         else:
             words = text.split("་")
-
         spaces = [False] * len(words)
         return Doc(self.vocab, words=words, spaces=spaces)
 
 
 class TibetanDefaults(Language.Defaults):
-    lex_attr_getters = dict(Language.Defaults.lex_attr_getters)
-    lex_attr_getters[LANG] = lambda text: "bo"
-    tokenizer_exceptions = BASE_EXCEPTIONS
+    config = util.load_config_from_str(DEFAULT_CONFIG)
     stop_words = STOP_WORDS
     writing_system = {"direction": "ltr", "has_case": False, "has_letters": False}
-    use_botok = True
-
-    @classmethod
-    def create_tokenizer(cls, nlp=None, config={}):
-        return TibetanTokenizer(cls, nlp, config=config)
 
 
 class Tibetan(Language):
     lang = "bo"
     Defaults = TibetanDefaults
 
-    def make_doc(self, text):
-        return self.tokenizer(text)
+
+def try_botok_import() -> None:
+    try:
+        from botok import Text
+
+        # tokenized a short text to have botok created its trie in advance
+        Text("བཀྲ་ཤིས་").tokenize_words_raw_lines
+
+        return Text
+    except ImportError:
+        msg = (
+            "botok not installed. Install it with `pip install botok` ",
+            "or from https://github.com/Esukhia/botok",
+        )
+        raise ImportError(msg)
 
 
 __all__ = ["Tibetan"]
