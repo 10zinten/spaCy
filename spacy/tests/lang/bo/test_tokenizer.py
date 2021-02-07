@@ -8,11 +8,48 @@ import pytest
     "text,expected_tokens",
     [
         (
-            "ལེ གས། བཀྲ་ཤིས་མཐའི་ ༆ ཤི་བཀྲ་ཤིས་  tr",
-            ["ལེ_གས", "།_", "བཀྲ་ཤིས་", "མཐ", "འི་", "_༆_", "ཤི་", "བཀྲ་ཤིས་__", "tr"],
+            "རྣལ་འབྱོར་བླ་མེད་ཀྱི་རྒྱུད་དོན་ལ་འཇུག་པ་ལས།",
+            [
+                "རྣལ",
+                "འབྱོར",
+                "བླ",
+                "མེད",
+                "ཀྱི",
+                "རྒྱུད",
+                "དོན",
+                "ལ",
+                "འཇུག",
+                "པ",
+                "ལས།",
+            ],
         )
     ],
 )
-def test_bo_tokenizer(bo_tokenizer, text, expected_tokens):
-    tokens = [token.text for token in bo_tokenizer(text)]
+def test_bo_tokenizer_syl(bo_tokenizer_syl, text, expected_tokens):
+    tokens = [token.text for token in bo_tokenizer_syl(text)]
+    assert tokens == expected_tokens
+
+
+@pytest.mark.parametrize(
+    "text,expected_tokens",
+    [
+        (
+            "རྣལ་འབྱོར་བླ་མེད་ཀྱི་རྒྱུད་དོན་ལ་འཇུག་པ་ལས།",
+            [
+                "རྣལ་འབྱོར་",
+                "བླ་མེད་",
+                "ཀྱི་",
+                "རྒྱུད་",
+                "དོན་",
+                "ལ་",
+                "འཇུག་པ་",
+                "ལ",
+                "ས",
+                "།",
+            ],
+        )
+    ],
+)
+def test_bo_tokenizer_botok(bo_tokenizer_botok, text, expected_tokens):
+    tokens = [token.text for token in bo_tokenizer_botok(text)]
     assert tokens == expected_tokens

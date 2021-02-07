@@ -45,8 +45,21 @@ def bn_tokenizer():
 
 
 @pytest.fixture(scope="session")
-def bo_tokenizer():
-    return get_lang_class("bo").Defaults.create_tokenizer()
+def bo_tokenizer_syl():
+    return get_lang_class("bo")().tokenizer
+
+
+@pytest.fixture(scope="session")
+def bo_tokenizer_botok():
+    config = {
+        "nlp": {
+            "tokenizer": {
+                "@tokenizers": "spacy.bo.TibetanTokenizer",
+                "segmenter": "botok",
+            }
+        }
+    }
+    return get_lang_class("bo").from_config(config).tokenizer
 
 
 @pytest.fixture(scope="session")
@@ -260,11 +273,9 @@ def ti_tokenizer():
     return get_lang_class("ti")().tokenizer
 
 
-
 @pytest.fixture(scope="session")
 def tr_tokenizer():
     return get_lang_class("tr")().tokenizer
-
 
 
 @pytest.fixture(scope="session")
