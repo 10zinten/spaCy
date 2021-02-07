@@ -32,6 +32,17 @@
             "tags": ["sentiment", "textblob"]
 	    },
         {
+            "id": "spacy-ray",
+            "title": "spacy-ray",
+            "slogan": "Parallel and distributed training with spaCy and Ray",
+            "description": "[Ray](https://ray.io/) is a fast and simple framework for building and running **distributed applications**. This very lightweight extension package lets you use Ray for parallel and distributed training with spaCy. If `spacy-ray` is installed in the same environment as spaCy, it will automatically add `spacy ray` commands to your spaCy CLI.",
+            "github": "explosion/spacy-ray",
+            "pip": "spacy-ray",
+            "category": ["training"],
+            "author": "Explosion / Anyscale",
+            "thumb": "https://i.imgur.com/7so6ZpS.png"
+        },
+        {
             "id": "spacy-sentence-bert",
             "title": "spaCy - sentence-transformers",
             "slogan": "Pipelines for pretrained sentence-transformers (BERT, RoBERTa, XLM-RoBERTa & Co.) directly within spaCy",
@@ -501,15 +512,16 @@
                 "from spacy_lookup import Entity",
                 "",
                 "nlp = spacy.load('en')",
-                "entity = Entity(keywords_list=['python', 'java platform'])",
+                "entity = Entity(keywords_list=['python', 'product manager', 'java platform'])",
                 "nlp.add_pipe(entity, last=True)",
                 "",
                 "doc = nlp(\"I am a product manager for a java and python.\")",
                 "assert doc._.has_entities == True",
-                "assert doc[2:5]._.has_entities == True",
                 "assert doc[0]._.is_entity == False",
+                "assert doc[3]._.entity_desc == 'product manager'",
                 "assert doc[3]._.is_entity == True",
-                "print(doc._.entities)"
+                "",
+                "print([(token.text, token._.canonical) for token in doc if token._.is_entity])"
             ],
             "author": "Marc Puig",
             "author_links": {
@@ -2100,10 +2112,8 @@
             "code_example": [
                 "import spacy",
                 "",
-                "nlp = spacy.load(\"en_trf_bertbaseuncased_lg\")",
-                "doc = nlp(\"Apple shares rose on the news. Apple pie is delicious.\")",
-                "print(doc[0].similarity(doc[7]))",
-                "print(doc._.trf_last_hidden_state.shape)"
+                "nlp = spacy.load(\"en_core_web_trf\")",
+                "doc = nlp(\"Apple shares rose on the news. Apple pie is delicious.\")"
             ],
             "author": "Explosion",
             "author_links": {
@@ -2670,6 +2680,60 @@
             },
             "category": ["scientific", "research", "standalone"],
             "tags": ["Evolutionary Computation", "Grammatical Evolution"]
+        },
+        {
+            "id": "SpacyDotNet",
+            "title": "spaCy .NET Wrapper",
+            "slogan": "SpacyDotNet is a .NET Core compatible wrapper for spaCy, based on Python.NET",
+            "description": "This projects relies on [Python.NET](http://pythonnet.github.io/) to interop with spaCy. It's not meant to be a complete and exhaustive implementation of all spaCy features and [APIs](https://spacy.io/api). Although it should be enough for basic tasks, it's considered as a starting point if you need to build a complex project using spaCy in .NET Most of the basic features in _Spacy101_ are available. All `Container` classes are present (`Doc`, `Token`, `Span` and `Lexeme`) with their basic properties/methods running and also `Vocab` and `StringStore` in a limited form. Anyway, any developer should be ready to add the missing properties or classes in a very straightforward manner.",
+            "github": "AMArostegui/SpacyDotNet",
+            "thumb": "https://raw.githubusercontent.com/AMArostegui/SpacyDotNet/master/cslogo.png",
+            "code_example": [
+                "var spacy = new Spacy();",
+                "",
+                "var nlp = spacy.Load(\"en_core_web_sm\");",
+                "var doc = nlp.GetDocument(\"Apple is looking at buying U.K. startup for $1 billion\");",
+                "",
+                "foreach (Token token in doc.Tokens)",
+                "    Console.WriteLine($\"{token.Text} {token.Lemma} {token.PoS} {token.Tag} {token.Dep} {token.Shape} {token.IsAlpha} {token.IsStop}\");",
+                "",
+                "Console.WriteLine(\"\");",
+                "foreach (Span ent in doc.Ents)",
+                "    Console.WriteLine($\"{ent.Text} {ent.StartChar} {ent.EndChar} {ent.Label}\");",
+                "",
+                "nlp = spacy.Load(\"en_core_web_md\");",
+                "var tokens = nlp.GetDocument(\"dog cat banana afskfsd\");",
+                "",
+                "Console.WriteLine(\"\");",
+                "foreach (Token token in tokens.Tokens)",
+                "    Console.WriteLine($\"{token.Text} {token.HasVector} {token.VectorNorm}, {token.IsOov}\");",
+                "",
+                "tokens = nlp.GetDocument(\"dog cat banana\");",
+                "Console.WriteLine(\"\");",
+                "foreach (Token token1 in tokens.Tokens)",
+                "{",
+                "    foreach (Token token2 in tokens.Tokens)",
+                "        Console.WriteLine($\"{token1.Text} {token2.Text} {token1.Similarity(token2) }\");",
+                "}",
+                "",
+                "doc = nlp.GetDocument(\"I love coffee\");",
+                "Console.WriteLine(\"\");",
+                "Console.WriteLine(doc.Vocab.Strings[\"coffee\"]);",
+                "Console.WriteLine(doc.Vocab.Strings[3197928453018144401]);",
+                "",
+                "Console.WriteLine(\"\");",
+                "foreach (Token word in doc.Tokens)",
+                "{",
+                "    var lexeme = doc.Vocab[word.Text];",
+                "    Console.WriteLine($@\"{lexeme.Text} {lexeme.Orth} {lexeme.Shape} {lexeme.Prefix} {lexeme.Suffix} {lexeme.IsAlpha} {lexeme.IsDigit} {lexeme.IsTitle} {lexeme.Lang}\");",
+                "}"                
+            ],    
+            "code_language": "csharp",
+            "author": "Antonio Miras",
+            "author_links": {
+                "github": "AMArostegui"
+            },
+            "category": ["nonpython"]
         }
     ],
 

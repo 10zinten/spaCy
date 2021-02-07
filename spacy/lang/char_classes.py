@@ -1,9 +1,8 @@
-# coding: utf8
-from __future__ import unicode_literals
-
 split_chars = lambda char: list(char.strip().split(" "))
 merge_chars = lambda char: char.strip().replace(" ", "|")
 group_chars = lambda char: char.strip().replace(" ", "")
+
+_ethiopic = r"\u1200-\u137F"
 
 _bengali = r"\u0980-\u09FF"
 
@@ -237,7 +236,8 @@ _lower = (
 )
 
 _uncased = (
-    _bengali
+    _ethiopic
+    + _bengali
     + _hebrew
     + _persian
     + _sinhala

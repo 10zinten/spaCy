@@ -1,15 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import GitHubButton from 'react-github-btn'
 
 import Link from './link'
 import Icon from './icon'
 import Dropdown from './dropdown'
 import { github } from './util'
-import { ReactComponent as Logo } from '../images/logo.svg'
+import Logo from '-!svg-react-loader!../images/logo.svg'
 import classes from '../styles/navigation.module.sass'
 
-const NavigationDropdown = ({ items, section }) => {
+const NavigationDropdown = ({ items = [], section }) => {
     const active = items.find(({ text }) => text.toLowerCase() === section)
     const defaultValue = active ? active.url : 'title'
     return (
@@ -26,13 +27,23 @@ const NavigationDropdown = ({ items, section }) => {
     )
 }
 
-const Navigation = ({ title, items, section, search, children }) => {
+export default function Navigation({ title, items = [], section, search, alert, children }) {
+    const logo = (
+        <Link to="/" aria-label={title} hidden>
+            <h1 className={classes.title}>{title}</h1>
+            <Logo className={classes.logo} width={300} height={96} />
+        </Link>
+    )
+
     return (
         <nav className={classes.root}>
-            <Link to="/" aria-label={title} hidden>
-                <h1 className={classes.title}>{title}</h1>
-                <Logo className={classes.logo} width={300} height={96} />
-            </Link>
+            {!alert ? (
+                logo
+            ) : (
+                <span className={classes.hasAlert}>
+                    {logo} <span className={classes.alert}>{alert}</span>
+                </span>
+            )}
 
             <div className={classes.menu}>
                 <NavigationDropdown items={items} section={section} />
@@ -51,10 +62,13 @@ const Navigation = ({ title, items, section, search, children }) => {
                             </li>
                         )
                     })}
-                    <li className={classes.item}>
-                        <Link to={github()} aria-label="GitHub" hidden>
-                            <Icon name="github" />
-                        </Link>
+                    <li className={classNames(classes.item, classes.github)}>
+                        <GitHubButton
+                            href={github()}
+                            data-size="large"
+                            data-show-count="true"
+                            aria-label="Star spaCy on GitHub"
+                        />
                     </li>
                 </ul>
                 {search && <div className={classes.search}>{search}</div>}
@@ -62,10 +76,6 @@ const Navigation = ({ title, items, section, search, children }) => {
             {children}
         </nav>
     )
-}
-
-Navigation.defaultProps = {
-    items: [],
 }
 
 Navigation.propTypes = {
@@ -79,5 +89,3 @@ Navigation.propTypes = {
     section: PropTypes.string,
     search: PropTypes.node,
 }
-
-export default Navigation

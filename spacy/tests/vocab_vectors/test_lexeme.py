@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import pytest
 import numpy
 from spacy.attrs import IS_ALPHA, IS_DIGIT
@@ -58,7 +55,7 @@ def test_vocab_lexeme_add_flag_provided_id(en_vocab):
     assert en_vocab["199"].check_flag(IS_DIGIT) is False
     assert en_vocab["the"].check_flag(is_len4) is False
     assert en_vocab["dogs"].check_flag(is_len4) is True
-
+    en_vocab.add_flag(lambda string: string.isdigit(), flag_id=IS_DIGIT)
 
 def test_vocab_lexeme_oov_rank(en_vocab):
     """Test that default rank is OOV_RANK."""
